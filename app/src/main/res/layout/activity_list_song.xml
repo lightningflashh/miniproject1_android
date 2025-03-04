@@ -7,75 +7,96 @@
     android:background="@color/defaultBackgroundColor"
     tools:context=".controllers.ListSongActivity">
 
+    <!-- Danh sách bài hát -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lst_music"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottom_player"
-        android:layout_marginBottom="0dp"
+        android:layout_above="@id/layout_music_bar"
         tools:listitem="@layout/item_music" />
 
-    <LinearLayout
-        android:id="@+id/bottom_player"
+    <!-- Thanh điều khiển nhạc -->
+    <RelativeLayout
+        android:id="@+id/layout_music_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="93dp"
         android:layout_alignParentBottom="true"
         android:background="@color/colorPrimaryDark"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:visibility="visible">
 
+        <!-- Ảnh bài hát -->
         <ImageView
-            android:id="@+id/img_current_song"
+            android:id="@+id/img_song"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/compact_disk" />
+            android:src="@mipmap/ic_launcher"
+            />
 
+        <!-- Layout chứa thông tin bài hát -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingStart="10dp">
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/img_song"
+            android:layout_toStartOf="@id/control_layout"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_current_song"
+                android:id="@+id/tv_title_song"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bài hát đang phát"
+                android:text="Tên bài hát"
                 android:textColor="@color/defaultBackgroundColor"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <TextView
-                android:id="@+id/tv_current_artist"
+                android:id="@+id/tv_singer_song"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ca sĩ"
-                android:textColor="@color/defaultBackgroundColor"
-                android:textSize="14sp" />
+                android:textColor="@android:color/darker_gray"
+                android:textSize="13sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/btn_prev"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:src="@drawable/ic_prev" />
+        <!-- Nhóm nút điều khiển -->
+        <LinearLayout
+            android:id="@+id/control_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp">
 
-        <ImageView
-            android:id="@+id/btn_play_pause"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="10dp"
-            android:src="@drawable/ic_pause" />
+            <ImageView
+                android:id="@+id/img_play_or_pause"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_pause"
+                android:layout_marginEnd="10dp" />
 
-        <ImageView
-            android:id="@+id/btn_next"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:src="@drawable/ic_next" />
+            <ImageView
+                android:id="@+id/img_next"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_next"
+                android:layout_marginEnd="10dp" />
 
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/img_clear"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_clear" />
+        </LinearLayout>
+
+    </RelativeLayout>
 
 </RelativeLayout>
