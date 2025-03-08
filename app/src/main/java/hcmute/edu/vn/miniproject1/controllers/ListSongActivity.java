@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -22,13 +25,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import hcmute.edu.vn.miniproject1.R;
 import hcmute.edu.vn.miniproject1.models.Song;
 import hcmute.edu.vn.miniproject1.models.adapters.SongAdapter;
 import hcmute.edu.vn.miniproject1.services.SongService;
+import hcmute.edu.vn.miniproject1.utils.SongRepository;
+
+
 
 public class ListSongActivity extends AppCompatActivity {
+
+    private SongRepository songRepository;
 
     private RecyclerView recyclerView;
     private SongAdapter songAdapter;
@@ -48,9 +58,17 @@ public class ListSongActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
             if (bundle == null) return;
-            mSong = (Song) bundle.getSerializable(OBJECT_SONG);
+
+            Song receivedSong = (Song) bundle.getSerializable(OBJECT_SONG);
             isPlaying = bundle.getBoolean(ACTION_STATUS);
+            Log.d("ListSongActivity", "isPlaying nhận từ Intent: " + isPlaying);
+
+            if (receivedSong != null) {
+                mSong = receivedSong;
+            }
+
             int action = bundle.getInt(ACTION_SONG, 0);
+
             handlePlayerMusic(action);
         }
     };
@@ -86,18 +104,29 @@ public class ListSongActivity extends AppCompatActivity {
         }
     }
 
-    private void sendActionToService (int action) {
+    private void sendActionToService(int action) {
         Intent intent = new Intent(ListSongActivity.this, SongService.class);
         intent.putExtra(ACTION_SONG, action);
+
+        Log.e("ListSongActivity", "Gửi action với status: " + isPlaying);
+
         if (action == ACTION_NEXT) {
-            onClickNext();
+            mSong = songRepository.getNextSong();
             Bundle bundle = new Bundle();
             bundle.putSerializable(OBJECT_SONG, mSong);
             intent.putExtras(bundle);
             startForegroundService(intent);
-        } else {
+        } else if (action == ACTION_PREV) {
+            onClickPrev();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(OBJECT_SONG, mSong);
+            intent.putExtras(bundle);
+            startForegroundService(intent);
+        }
+        else {
             startService(intent);
         }
+        songRepository.setCurrentSong(mSong);
     }
 
     private void setStatusButtonPlayOrPause() {
@@ -108,13 +137,14 @@ public class ListSongActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_song);
 
         mapping();
+
+        songRepository = SongRepository.getInstance();
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -124,8 +154,7 @@ public class ListSongActivity extends AppCompatActivity {
         decoration.setDrawable(drawable);
         recyclerView.addItemDecoration(decoration);
 
-        songAdapter = new SongAdapter(getListSong(), this::onClickGoToPlaySong);
-        recyclerView.setAdapter(songAdapter);
+        loadSongsAsync();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter(ACTION_SEND_DATA_TO_ACTIVITY));
 
@@ -141,41 +170,71 @@ public class ListSongActivity extends AppCompatActivity {
 
         imgNext.setOnClickListener(v -> sendActionToService(ACTION_NEXT));
 
-    }
+        layoutMusicBar.setOnClickListener(v -> {
+            if (mSong != null) {
+                Intent intent = new Intent(this, ItemSongActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(OBJECT_SONG, mSong);
+                bundle.putBoolean(ACTION_STATUS, isPlaying);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
 
-    private List<Song> getListSong() {
-        lstSong.add(new Song("CHÚNG TA CÒN Ở ĐÓ KHÔNG?", "Orange", R.drawable.song1, R.raw.chungtaconodokhong_orange));
-        lstSong.add(new Song("DÙ CHO TẬN THẾ", "Erik", R.drawable.song2, R.raw.duchotanthe_erik));
-        lstSong.add(new Song("NOKIA", "VCC Left Hand", R.drawable.song3, R.raw.nokia_lefthand));
-        lstSong.add(new Song("Some one you loved", "Lewis Capaldi", R.drawable.song4, R.raw.someoneyouloved_lewiscapaldi));
-        lstSong.add(new Song("Window Shopper", "Hurrykng", R.drawable.song5, R.raw.windowshopper_hurrykng));
-        lstSong.add(new Song("MA NƠ CANH", "Hurrykng", R.drawable.song6, R.raw.manocanh_hurrykng));
-        return lstSong;
+    }
+    private void loadSongsAsync() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            List<Song> songs = songRepository.getSongList();
+
+            handler.post(() -> {
+                lstSong = songs;
+                songAdapter = new SongAdapter(songRepository.getSongList(), ListSongActivity.this::onClickGoToPlaySong);
+                recyclerView.setAdapter(songAdapter);
+            });
+        });
     }
 
     private void onClickGoToPlaySong(Song song) {
-        clickStopService();
+        if (isPlaying) {
+            clickStopService();
+        }
         mSong = song;
-        tvTitleSong.setText(song.getTitle());
-        tvSingerSong.setText(song.getSinger());
-        imgSong.setImageResource(song.getImage());
+        songRepository.setCurrentSong(mSong);
+        displaySongInfo();
         clickStartService(song);
     }
 
     private void clickStopService() {
         sendActionToService(ACTION_CLEAR);
-        Intent intent = new Intent(this, SongService.class);
-        stopService(intent);
     }
-
 
     private void clickStartService(Song song) {
         Intent intent = new Intent(this, SongService.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(OBJECT_SONG, song);
+        isPlaying = true;
+        Log.e("ListSongActivity", "Gửi trạng thái isPlaying: true");
+        bundle.putBoolean(ACTION_STATUS, isPlaying);
         intent.putExtras(bundle);
+        startForegroundServiceOnBackground(intent);
+    }
 
-        startForegroundService(intent);
+    private void startForegroundServiceOnBackground(Intent intent) {
+        new Handler(Looper.getMainLooper()).post(() -> startForegroundService(intent));
+    }
+
+    private void mapping() {
+        layoutMusicBar = findViewById(R.id.layout_music_bar);
+        imgSong = findViewById(R.id.img_song);
+        imgPlayOrPause = findViewById(R.id.img_play_or_pause);
+        imgClear = findViewById(R.id.img_clear);
+        imgNext = findViewById(R.id.img_next);
+        tvTitleSong = findViewById(R.id.tv_title_song);
+        tvSingerSong = findViewById(R.id.tv_singer_song);
+        recyclerView = findViewById(R.id.lst_music);
     }
 
     private void onClickNext() {
@@ -189,17 +248,17 @@ public class ListSongActivity extends AppCompatActivity {
         }
     }
 
-    private void mapping() {
-        layoutMusicBar = findViewById(R.id.layout_music_bar);
-        imgSong = findViewById(R.id.img_song);
-        imgPlayOrPause = findViewById(R.id.img_play_or_pause);
-        imgClear = findViewById(R.id.img_clear);
-        imgNext = findViewById(R.id.img_next);
-        tvTitleSong = findViewById(R.id.tv_title_song);
-        tvSingerSong = findViewById(R.id.tv_singer_song);
-        imgSong = findViewById(R.id.img_song);
-        recyclerView = findViewById(R.id.lst_music);
+    private void onClickPrev() {
+        if (lstSong == null || lstSong.isEmpty()) return;
+
+        for (int i = lstSong.size() - 1; i >= 0; i--) {
+            if (lstSong.get(i).getTitle().equals(mSong.getTitle())) {
+                mSong = (i == 0) ? lstSong.get(lstSong.size() - 1) : lstSong.get(i - 1);
+                break;
+            }
+        }
     }
+
 
     @Override
     protected void onDestroy() {

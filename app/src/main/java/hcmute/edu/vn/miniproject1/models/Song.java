@@ -1,6 +1,7 @@
 package hcmute.edu.vn.miniproject1.models;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Song implements Serializable {
     private String title;
@@ -46,4 +47,14 @@ public class Song implements Serializable {
     public void setResource(int resource) {
         this.resource = resource;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Song song = (Song) obj;
+        return Objects.equals(title, song.title) &&
+                Objects.equals(singer, song.singer);
+    }
+
 }

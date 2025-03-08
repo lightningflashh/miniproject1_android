@@ -15,6 +15,7 @@ public class Constants {
     public static final String ACTION_STATUS = "status_player";
     public static final String ACTION_SEND_DATA_TO_ACTIVITY = "send_data_to_activity";
 
-
-
+    public static final int ACTION_SEEK_TO = 7;
+    public static final String ACTION_CURRENT_POSITION = "current_position";
+    public static final String ACTION_TOTAL_DURATION = "total_duration";
 }
