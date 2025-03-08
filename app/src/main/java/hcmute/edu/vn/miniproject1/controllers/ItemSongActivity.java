@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -30,7 +29,7 @@ public class ItemSongActivity extends AppCompatActivity {
     private SongRepository songRepository;
 
     TextView tvNameSong, tvSinger, tvCurrentTime, tvTotalTime;
-    ImageButton btnPre, btnPlay, btnNext;
+    ImageButton btnPre, btnPlay, btnNext, btnBack;
     SeekBar skbSong;
     Song mSong;
     boolean isPlaying;
@@ -45,7 +44,6 @@ public class ItemSongActivity extends AppCompatActivity {
             Bundle bundle = intent.getExtras();
             if (bundle == null) return;
 
-            // Lấy bài hát và trạng thái hiện tại
             mSong = (Song) bundle.getSerializable(OBJECT_SONG);
             isPlaying = bundle.getBoolean(ACTION_STATUS, isPlaying);
             currentDuration = bundle.getInt("current_position", 0);
@@ -55,12 +53,21 @@ public class ItemSongActivity extends AppCompatActivity {
                 songRepository.setCurrentSong(mSong);
             }
 
-            // Cập nhật giao diện
             displaySongInfo();
             setStatusButtonPlayOrPause();
             updateSeekBar();
+
+            if (isPlaying) {
+                startRotation();
+            }
+
+            // Kiểm tra nếu hết bài thì tự động chuyển bài
+            if (currentDuration >= totalDuration) {
+                sendActionToService(ACTION_NEXT);
+            }
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +110,7 @@ public class ItemSongActivity extends AppCompatActivity {
         // Xử lý sự kiện Next / Prev
         btnNext.setOnClickListener(v -> sendActionToService(ACTION_NEXT));
         btnPre.setOnClickListener(v -> sendActionToService(ACTION_PREV));
+        btnBack.setOnClickListener(v -> finish());
 
         // Xử lý sự kiện kéo SeekBar để tua bài hát
         skbSong.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -192,6 +200,7 @@ public class ItemSongActivity extends AppCompatActivity {
         tvSinger = findViewById(R.id.tvSinger);
         btnPre = findViewById(R.id.btnPre);
         btnPlay = findViewById(R.id.btnPlay);
+        btnBack = findViewById(R.id.btn_back);
         btnNext = findViewById(R.id.btnNext);
         skbSong = findViewById(R.id.seekBarSong);
         tvCurrentTime = findViewById(R.id.tv_current_time);
@@ -205,9 +214,7 @@ public class ItemSongActivity extends AppCompatActivity {
         animator.setDuration(5000);
         animator.setInterpolator(new LinearInterpolator());
         animator.setRepeatCount(ObjectAnimator.INFINITE);
-        animator.start();
     }
-
 
     private void startRotation() {
         if (animator != null) {

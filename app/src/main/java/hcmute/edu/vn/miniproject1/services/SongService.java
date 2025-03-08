@@ -1,18 +1,6 @@
 package hcmute.edu.vn.miniproject1.services;
 
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_CLEAR;
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_NAME;
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_NEXT;
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_PAUSE;
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_PREV;
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_RESUME;
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_SEEK_TO;
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_SEND_DATA_TO_ACTIVITY;
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_SONG;
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_START;
-import static hcmute.edu.vn.miniproject1.utils.Constants.ACTION_STATUS;
-import static hcmute.edu.vn.miniproject1.utils.Constants.CHANNEL_ID;
-import static hcmute.edu.vn.miniproject1.utils.Constants.OBJECT_SONG;
+import static hcmute.edu.vn.miniproject1.utils.Constants.*;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -45,6 +33,8 @@ public class SongService extends Service {
     private boolean isPlaying;
 
     private Handler handler = new Handler();
+
+    int currentPosition = 0;
     private final Runnable updateSeekBarRunnable = new Runnable() {
         @Override
         public void run() {
@@ -65,42 +55,6 @@ public class SongService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
-
-//    @Override
-//    public int onStartCommand(Intent intent, int flags, int startId) {
-//        Log.e("Notification", "Service onStartCommand");
-//
-//        if (intent != null) {
-//            Bundle bundle = intent.getExtras();
-//            if (bundle != null) {
-//                Song song = (Song) bundle.getSerializable(OBJECT_SONG);
-//                boolean status = bundle.getBoolean("ACTION_STATUS", isPlaying);
-//                Log.d("SongService", "Gửi trạng thái isPlaying: " + status);
-//                if (song != null) {
-//                    mSong = song;
-//                    isPlaying = status;
-//                    startMusic(song);
-//                    sendNotification(song);
-//                }
-//            }
-//
-//            int actionMusic = intent.getIntExtra(ACTION_SONG, 0);
-//            if (actionMusic == ACTION_SEEK_TO) {
-//                int seekPosition = intent.getIntExtra("seek_position", 0);
-//                if (mediaPlayer != null) {
-//                    mediaPlayer.seekTo(seekPosition);
-//                }
-//            } else {
-//                handleActionMusic(actionMusic);
-//            }
-//        } else {
-//            Log.e("MyService", "Intent nhận vào bị null!");
-//        }
-//
-//        handler.postDelayed(updateSeekBarRunnable, 1000); // Luôn cập nhật SeekBar
-//        return START_STICKY;
-//    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -137,9 +91,6 @@ public class SongService extends Service {
         return START_STICKY;
     }
 
-
-
-
     private void handleActionMusic(int action) {
         if (action == ACTION_PAUSE) {
             pauseMusic();
@@ -155,70 +106,37 @@ public class SongService extends Service {
         }
     }
 
-//    private void pauseMusic() {
-//        if (mediaPlayer != null && isPlaying) {
-//            mediaPlayer.pause();
-//            isPlaying = false;
-//            sendNotification(mSong);
-//            sendToListSongActivity(ACTION_PAUSE);
-//        }
-//    }
-
     private void pauseMusic() {
         if (mediaPlayer != null && isPlaying) {
+            currentPosition = mediaPlayer.getCurrentPosition();
             mediaPlayer.pause();
             isPlaying = false;
 
-            int currentPosition = mediaPlayer.getCurrentPosition();  // ✅ Lấy vị trí hiện tại
             sendNotification(mSong);
-            sendToListSongActivity(ACTION_PAUSE, currentPosition);  // ✅ Gửi vị trí hiện tại
+            sendToListSongActivity(ACTION_PAUSE, currentPosition);
         }
     }
-
-
-//    private void resumeMusic() {
-//        if (mediaPlayer != null && !isPlaying) {
-//            mediaPlayer.start();
-//            isPlaying = true;
-//            sendNotification(mSong);
-//            sendToListSongActivity(ACTION_RESUME);
-//        }
-//    }
 
     private void resumeMusic() {
         if (mediaPlayer != null && !isPlaying) {
+            mediaPlayer.seekTo(currentPosition);
             mediaPlayer.start();
             isPlaying = true;
 
-            int currentPosition = mediaPlayer.getCurrentPosition();  // ✅ Lấy vị trí hiện tại
             sendNotification(mSong);
-            sendToListSongActivity(ACTION_RESUME, currentPosition);  // ✅ Gửi vị trí hiện tại
+            sendToListSongActivity(ACTION_RESUME, currentPosition);
         }
     }
-
-
-//    private void startMusic(Song song) {
-//        if (mediaPlayer == null) {
-//            mediaPlayer = MediaPlayer.create(getApplicationContext(), song.getResource());
-//        }
-//        mediaPlayer.start();
-//        isPlaying = true;
-//        sendToListSongActivity(ACTION_START);
-//    }
 
     private void startMusic(Song song) {
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(getApplicationContext(), song.getResource());
         }
-
-        mediaPlayer = MediaPlayer.create(getApplicationContext(), song.getResource());
         mediaPlayer.start();
         isPlaying = true;
-
-        sendToListSongActivity(ACTION_START, 0);  // ✅ Khi bắt đầu phát, SeekBar về 0
+        sendToListSongActivity(ACTION_START, mediaPlayer.getCurrentPosition());
     }
+
 
 
     private void sendNotification(Song song) {
@@ -259,19 +177,6 @@ public class SongService extends Service {
                 action, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
-//    private void sendToListSongActivity(int action) {
-//        Intent intent = new Intent(ACTION_SEND_DATA_TO_ACTIVITY);
-//        intent.putExtra(ACTION_SONG, action);
-//
-//        Bundle bundle = new Bundle();
-//        bundle.putSerializable(OBJECT_SONG, mSong);
-//        bundle.putBoolean(ACTION_STATUS, isPlaying);
-//        Log.d("SongService", "Gửi trạng thái isPlaying: " + isPlaying);
-//        bundle.putInt(ACTION_NAME, 0);
-//        intent.putExtras(bundle);
-//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-//    }
-
     private void sendToListSongActivity(int action, int currentPosition) {
         Intent intent = new Intent(ACTION_SEND_DATA_TO_ACTIVITY);
         intent.putExtra(ACTION_SONG, action);
@@ -280,7 +185,7 @@ public class SongService extends Service {
         if (mediaPlayer != null) {
             intent.putExtra("total_duration", mediaPlayer.getDuration());
         } else {
-            intent.putExtra("total_duration", 0);  // 🔥 Tránh lỗi NullPointerException
+            intent.putExtra("total_duration", 0);
         }
 
         Bundle bundle = new Bundle();
@@ -291,8 +196,6 @@ public class SongService extends Service {
         intent.putExtras(bundle);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
-
-
 
     private void nextSong() {
 
