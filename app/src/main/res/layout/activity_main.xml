@@ -5,15 +5,40 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <Button
+        android:id="@+id/btn_play_music"
+        android:layout_width="246dp"
+        android:layout_height="84dp"
+        android:layout_marginTop="64dp"
+        android:text="Play music"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_sms_call"
+        android:layout_width="246dp"
+        android:layout_height="84dp"
+        android:layout_marginTop="160dp"
+        android:text="SMS and CALL"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_play_music" />
+
+    <Button
+        android:id="@+id/btn_alarm"
+        android:layout_width="246dp"
+        android:layout_height="84dp"
+        android:layout_marginTop="188dp"
+        android:text="Alarm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_sms_call" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

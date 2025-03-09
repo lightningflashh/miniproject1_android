@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context=".controllers.ListSongActivity">
+
+    <!-- Danh sách bài hát -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/lst_music"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/layout_music_bar"
+        tools:listitem="@layout/item_music" />
+
+    <!-- Thanh điều khiển nhạc -->
+    <RelativeLayout
+        android:id="@+id/layout_music_bar"
+        android:layout_width="match_parent"
+        android:layout_height="93dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimaryDark"
+        android:visibility="gone">
+
+        <!-- Ảnh bài hát -->
+        <ImageView
+            android:id="@+id/img_song"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_launcher"
+            />
+
+        <!-- Layout chứa thông tin bài hát -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/img_song"
+            android:layout_toStartOf="@id/control_layout"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_title_song"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tên bài hát"
+                android:textColor="@color/defaultBackgroundColor"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tv_singer_song"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ca sĩ"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="13sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <!-- Nhóm nút điều khiển -->
+        <LinearLayout
+            android:id="@+id/control_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp">
+
+            <ImageView
+                android:id="@+id/img_play_or_pause"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_pause"
+                android:layout_marginEnd="10dp" />
+
+            <ImageView
+                android:id="@+id/img_next"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_next"
+                android:layout_marginEnd="10dp" />
+
+            <ImageView
+                android:id="@+id/img_clear"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_clear" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

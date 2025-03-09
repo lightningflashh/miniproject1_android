@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_item_music"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@null"
+    android:padding="10dp"
+    >
+
+    <ImageView
+        android:id="@+id/img_song"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/compact_disk"
+        android:background="@drawable/circle_shape"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/img_song"
+        android:layout_marginStart="10dp">
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tên bài hát"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tv_singer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ca sĩ"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#664346"
+            />
+
+    </LinearLayout>
+
+</RelativeLayout>

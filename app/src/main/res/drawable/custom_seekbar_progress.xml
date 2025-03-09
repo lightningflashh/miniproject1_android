@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background của SeekBar -->
+    <item>
+        <shape android:shape="rectangle">
+            <size android:height="10dp"/>  <!-- Tăng độ dày -->
+            <solid android:color="#D3D3D3"/>  <!-- Màu xám nhạt -->
+            <corners android:radius="5dp"/>
+        </shape>
+    </item>
+
+    <!-- Thanh progress chạy -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <size android:height="10dp"/>
+                <solid android:color="@color/colorPrimary"/>  <!-- Gradient màu cam -->
+                <corners android:radius="5dp"/>
+            </shape>
+        </clip>
+    </item>
+</layer-list>
