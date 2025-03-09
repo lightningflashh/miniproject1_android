@@ -22,7 +22,7 @@
         android:layout_height="93dp"
         android:layout_alignParentBottom="true"
         android:background="@color/colorPrimaryDark"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <!-- Ảnh bài hát -->
         <ImageView
