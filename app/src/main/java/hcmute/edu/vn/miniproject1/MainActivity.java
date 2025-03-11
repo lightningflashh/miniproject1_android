@@ -10,6 +10,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import hcmute.edu.vn.miniproject1.controllers.CallActivity;
 import hcmute.edu.vn.miniproject1.controllers.ListSongActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,6 +28,11 @@ public class MainActivity extends AppCompatActivity {
 
         btnPlayMusic.setOnClickListener(v -> {
             Intent intent = new Intent(this, ListSongActivity.class);
+            startActivity(intent);
+        });
+
+        btnSMSAndCall.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CallActivity.class);
             startActivity(intent);
         });
     }
