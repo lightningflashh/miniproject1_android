@@ -4,8 +4,19 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Xác định thiết bị có hỗ trợ điện thoại hay không -->
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
+    <!-- Quyền gọi điện -->
+    <uses-permission android:name="android.permission.CALL_PHONE"
+        tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".MyApplication"
@@ -19,13 +30,14 @@
         android:theme="@style/Theme.MiniProject1"
         tools:targetApi="31">
         <activity
+            android:name=".controllers.CallActivity"
+            android:exported="false" />
+        <activity
             android:name=".controllers.ItemSongActivity"
             android:exported="false" />
         <activity
             android:name=".controllers.ListSongActivity"
-            android:exported="false">
-
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -34,22 +46,26 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Service có thể chạy trong Foreground -->
+        </activity> <!-- Service có thể chạy trong Foreground -->
         <service
             android:name=".services.SongService"
-            android:exported="true"
             android:enabled="true"
-            android:foregroundServiceType="mediaPlayback"/>
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback" /> <!-- Broadcast Receiver nhận sự kiện BOOT_COMPLETED -->
 
-        <!-- Broadcast Receiver nhận sự kiện BOOT_COMPLETED -->
+        <service
+            android:name=".services.CallService"
+            android:exported="false" />
+
+        <service
+            android:name=".services.CallStateService"
+            android:exported="false"/>
         <receiver
             android:name=".services.SongReceiver"
-            android:exported="true"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
     </application>

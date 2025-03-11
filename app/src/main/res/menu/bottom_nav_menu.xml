@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:backgroundTint="@color/colorPrimary"
+        android:id="@+id/nav_dial"
+        android:icon="@android:drawable/ic_menu_call"
+        android:title="Dial" />
+
+    <item
+        android:backgroundTint="@color/colorPrimary"
+        android:id="@+id/nav_sms"
+        android:icon="@android:drawable/ic_dialog_email"
+        android:title="SMS" />
+
+
+
+</menu>
