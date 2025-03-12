@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+
 
     <!-- Xác định thiết bị có hỗ trợ điện thoại hay không -->
     <uses-feature
@@ -68,6 +71,25 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".controllers.CalendarActivity"
+            android:exported="false">
+        </activity>
+
+        <activity
+            android:name=".controllers.EventCompletedActivity"
+            android:exported="false">
+        </activity>
+        <receiver
+            android:name=".services.EventReminderReceiver"
+            android:exported="false"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="hcmute.edu.vn.miniproject1.EVENT_REMINDER" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
