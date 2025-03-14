@@ -2,6 +2,7 @@ package hcmute.edu.vn.miniproject1.controllers;
 
 import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
@@ -9,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -24,6 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -34,6 +38,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 import hcmute.edu.vn.miniproject1.R;
 import hcmute.edu.vn.miniproject1.models.Event;
 import hcmute.edu.vn.miniproject1.models.adapters.EventAdapter;
@@ -55,6 +60,15 @@ public class CalendarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
+        createNotificationChannel();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            if (!alarmManager.canScheduleExactAlarms()) {
+                Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                startActivity(intent);
+            }
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Log.d("DEBUG", "Đăng ký BroadcastReceiver động...");
@@ -62,10 +76,10 @@ public class CalendarActivity extends AppCompatActivity {
             // Cập nhật cách đăng ký để tránh lỗi
             registerReceiver(eventReminderReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
         }
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager != null) {
-            notificationManager.cancelAll();
+        if (Build.VERSION.SDK_INT >= 33) { // Android 13 trở lên
+            if (ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{"android.permission.POST_NOTIFICATIONS"}, 101);
+            }
         }
 
         // Ánh xạ View
@@ -112,9 +126,25 @@ public class CalendarActivity extends AppCompatActivity {
             }
             return false;
         });
+
+
     }
 
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "event_channel",
+                    "Lịch nhắc sự kiện",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Kênh thông báo cho sự kiện lịch");
 
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
 
     // khởi tạo ra 1 trang dialog cho việc thêm 1 event
     private void showEventDialog(Long eventId, String existingTitle, String existingText, String existingTime) {
@@ -149,12 +179,30 @@ public class CalendarActivity extends AppCompatActivity {
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
             int minute = calendar.get(Calendar.MINUTE);
-            new TimePickerDialog(this, (view, selectedHour, selectedMinute) -> {
-                String amPm = (selectedHour >= 12) ? "PM" : "AM";
-                int displayHour = (selectedHour == 0) ? 12 : (selectedHour > 12 ? selectedHour - 12 : selectedHour);
-                textViewTime.setText(String.format("%02d:%02d %s", displayHour, selectedMinute, amPm));
-            }, hour, minute, true).show();
+            TimePickerDialog timePicker = new TimePickerDialog(this, (view, selectedHour, selectedMinute) -> {
+                String amPm;
+                int displayHour;
+
+                if (selectedHour == 0) {
+                    displayHour = 12;
+                    amPm = "AM";
+                } else if (selectedHour == 12) {
+                    displayHour = 12;
+                    amPm = "PM";
+                } else if (selectedHour > 12) {
+                    displayHour = selectedHour - 12;
+                    amPm = "PM";
+                } else {
+                    displayHour = selectedHour;
+                    amPm = "AM";
+                }
+
+                textViewTime.setText(String.format(Locale.getDefault(), "%02d:%02d %s", displayHour, selectedMinute, amPm));
+            }, hour, minute, false);
+
+            timePicker.show();
         });
+
 
         final Long[] eventIdWrapper = {eventId}; // Dùng mảng để chứa eventId
 
@@ -167,12 +215,14 @@ public class CalendarActivity extends AppCompatActivity {
                 Toast.makeText(this, "Vui lòng nhập tiêu đề", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             long timeInMillis = getTimeInMillis(selectedDate, time);
-            if (timeInMillis == -1 || timeInMillis <= System.currentTimeMillis()) {
-                Toast.makeText(this, "Vui lòng chọn thời gian hợp lệ", Toast.LENGTH_SHORT).show();
+            if (timeInMillis <= System.currentTimeMillis()) {
+                Toast.makeText(this, "Vui lòng chọn thời gian trong tương lai!", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+
+
             if (eventIdWrapper[0] == null) { // Thêm sự kiện mới
                 eventIdWrapper[0] = dbHelper.saveEvent(selectedDate, title, description, time);
                 if (eventIdWrapper[0] == -1) {
@@ -248,43 +298,48 @@ public class CalendarActivity extends AppCompatActivity {
             return;
         }
 
-        Log.d("DEBUG", "Đang đặt báo thức cho sự kiện ID: " + event.getId() + " vào lúc: " + triggerTime);
+        Log.d("DEBUG", "✅ Đang đặt báo thức cho sự kiện ID: " + event.getId() + " vào lúc: " + triggerTime);
 
         Intent intent = new Intent(this, EventReminderReceiver.class);
         intent.putExtra("event_id", event.getId());
         intent.putExtra("event_title", event.getTitle());
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
+        }
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                this, (int) event.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int) event.getId(), intent, flags);
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String formattedTime = sdf.format(new Date(triggerTime));
-        Log.d("DEBUG", "Thời gian báo thức: " + formattedTime);
+        Log.d("DEBUG", "📅 Thời gian báo thức: " + formattedTime);
+
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
     }
 
 
-
-
-
-    // Xét thời gian bằng giây để xác thực việc đặt event đúng và kog bị sai
-
     private long getTimeInMillis(String date, String time) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getDefault());
+
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             Date dateTime = sdf.parse(date + " " + time);
-            return dateTime != null ? dateTime.getTime() : -1;
+            if (dateTime == null) {
+                Log.e("getTimeInMillis", "Lỗi khi chuyển đổi thời gian");
+                return -1;
+            }
+            Log.d("DEBUG", "Parsed Date: " + dateTime.toString());
+            return dateTime.getTime();
         } catch (ParseException e) {
-            e.printStackTrace();
+            Log.e("getTimeInMillis", "Lỗi ParseException: " + e.getMessage());
             return -1;
         }
     }
-
-
     @Override
     protected void onResume() {
         super.onResume();
         BottomNavigationView bottomNavigation = findViewById(R.id.nav_bottom);
-        bottomNavigation.setSelectedItemId(R.id.icon_home); // Môi khi chạy lại trang main thì nó load lại navBottom cho đúng icon đc hiển thị
+        bottomNavigation.setSelectedItemId(R.id.icon_home);
     }
+
 }

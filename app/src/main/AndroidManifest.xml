@@ -93,17 +93,18 @@
 
         <activity
             android:name=".controllers.CalendarActivity"
-            android:exported="false"></activity>
+            android:exported="false">
+        </activity>
         <activity
             android:name=".controllers.EventCompletedActivity"
-            android:exported="false"></activity>
+            android:exported="false">
+        </activity>
 
-        <receiver
-            android:name=".services.EventReminderReceiver"
-            android:exported="false"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+        <receiver android:name=".services.EventReminderReceiver"
+            android:exported="true"
+            android:enabled="true">
             <intent-filter>
-                <action android:name="hcmute.edu.vn.miniproject1.EVENT_REMINDER" />
+                <action android:name="hcmute.edu.vn.miniproject1.EVENT_REMINDER"/>
             </intent-filter>
         </receiver>
 

@@ -69,7 +69,6 @@ public class EventDatabaseHelper extends SQLiteOpenHelper {
         values.put("title", title);
         values.put("description", description);
         values.put("time", time);
-
         long eventId = db.insert("events", null, values); // Lưu sự kiện vào database
         db.close();
         return eventId; // Trả về ID của sự kiện vừa lưu
