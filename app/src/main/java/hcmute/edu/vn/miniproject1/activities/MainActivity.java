@@ -1,20 +1,14 @@
-package hcmute.edu.vn.miniproject1;
+package hcmute.edu.vn.miniproject1.activities;
 
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.widget.Button;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
+import hcmute.edu.vn.miniproject1.R;
 import hcmute.edu.vn.miniproject1.configs.BatteryReceiver;
-import hcmute.edu.vn.miniproject1.controllers.CalendarActivity;
-import hcmute.edu.vn.miniproject1.controllers.CallActivity;
-import hcmute.edu.vn.miniproject1.controllers.ListSongActivity;
 
 public class MainActivity extends AppCompatActivity {
 

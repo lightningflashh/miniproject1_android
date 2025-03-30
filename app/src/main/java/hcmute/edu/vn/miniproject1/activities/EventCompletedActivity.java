@@ -1,4 +1,4 @@
-package hcmute.edu.vn.miniproject1.controllers;
+package hcmute.edu.vn.miniproject1.activities;
 
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -10,7 +10,7 @@ import java.util.List;
 
 import hcmute.edu.vn.miniproject1.R;
 import hcmute.edu.vn.miniproject1.models.Event;
-import hcmute.edu.vn.miniproject1.models.adapters.CompletedEventAdapter;
+import hcmute.edu.vn.miniproject1.adapters.CompletedEventAdapter;
 import hcmute.edu.vn.miniproject1.services.EventDatabaseHelper;
 
 public class EventCompletedActivity extends AppCompatActivity {

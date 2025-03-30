@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.BatteryManager;
 import android.widget.Toast;
 
-import hcmute.edu.vn.miniproject1.controllers.BatterySaverActivity;
+import hcmute.edu.vn.miniproject1.activities.BatterySaverActivity;
 
 public class BatteryReceiver extends BroadcastReceiver {
     @Override

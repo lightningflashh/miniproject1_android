@@ -1,4 +1,4 @@
-package hcmute.edu.vn.miniproject1.controllers;
+package hcmute.edu.vn.miniproject1.activities;
 
 import static hcmute.edu.vn.miniproject1.utils.Constants.*;
 

@@ -24,7 +24,7 @@ import android.os.Handler;
 
 
 import hcmute.edu.vn.miniproject1.R;
-import hcmute.edu.vn.miniproject1.controllers.ListSongActivity;
+import hcmute.edu.vn.miniproject1.activities.ListSongActivity;
 import hcmute.edu.vn.miniproject1.models.Song;
 
 public class SongService extends Service {

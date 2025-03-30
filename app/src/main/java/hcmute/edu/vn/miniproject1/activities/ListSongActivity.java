@@ -1,4 +1,4 @@
-package hcmute.edu.vn.miniproject1.controllers;
+package hcmute.edu.vn.miniproject1.activities;
 
 import static hcmute.edu.vn.miniproject1.utils.Constants.*;
 
@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 
 import hcmute.edu.vn.miniproject1.R;
 import hcmute.edu.vn.miniproject1.models.Song;
-import hcmute.edu.vn.miniproject1.models.adapters.SongAdapter;
+import hcmute.edu.vn.miniproject1.adapters.SongAdapter;
 import hcmute.edu.vn.miniproject1.services.SongService;
 import hcmute.edu.vn.miniproject1.utils.SongRepository;
 

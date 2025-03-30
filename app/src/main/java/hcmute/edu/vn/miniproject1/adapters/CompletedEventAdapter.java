@@ -1,4 +1,4 @@
-package hcmute.edu.vn.miniproject1.models.adapters;
+package hcmute.edu.vn.miniproject1.adapters;
 
 import android.app.AlertDialog;
 import android.content.Context;

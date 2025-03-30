@@ -1,4 +1,4 @@
-package hcmute.edu.vn.miniproject1.controllers;
+package hcmute.edu.vn.miniproject1.activities;
 
 import android.Manifest;
 import android.content.Intent;
@@ -13,9 +13,6 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;

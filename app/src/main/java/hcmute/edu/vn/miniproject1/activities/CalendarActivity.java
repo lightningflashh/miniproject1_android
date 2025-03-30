@@ -1,4 +1,4 @@
-package hcmute.edu.vn.miniproject1.controllers;
+package hcmute.edu.vn.miniproject1.activities;
 
 import android.app.AlarmManager;
 import android.app.Dialog;
@@ -41,7 +41,7 @@ import java.util.Objects;
 import java.util.TimeZone;
 import hcmute.edu.vn.miniproject1.R;
 import hcmute.edu.vn.miniproject1.models.Event;
-import hcmute.edu.vn.miniproject1.models.adapters.EventAdapter;
+import hcmute.edu.vn.miniproject1.adapters.EventAdapter;
 import hcmute.edu.vn.miniproject1.services.EventDatabaseHelper;
 import hcmute.edu.vn.miniproject1.services.EventReminderReceiver;
 

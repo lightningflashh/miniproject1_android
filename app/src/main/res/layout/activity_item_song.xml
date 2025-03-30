@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:background="@drawable/bg"
-    tools:context=".controllers.ItemSongActivity">
+    tools:context=".activities.ItemSongActivity">
 
     <ImageButton
         android:id="@+id/btn_back"

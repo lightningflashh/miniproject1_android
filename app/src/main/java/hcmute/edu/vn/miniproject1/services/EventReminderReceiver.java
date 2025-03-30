@@ -10,7 +10,7 @@ import android.os.Build;
 import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import hcmute.edu.vn.miniproject1.R;
-import hcmute.edu.vn.miniproject1.controllers.CalendarActivity;
+import hcmute.edu.vn.miniproject1.activities.CalendarActivity;
 import hcmute.edu.vn.miniproject1.models.Event;
 public class EventReminderReceiver extends BroadcastReceiver {
     @Override
