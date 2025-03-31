@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,7 +13,7 @@ import hcmute.edu.vn.miniproject1.configs.BatteryReceiver;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnPlayMusic, btnSMSAndCall, btnAlarm;
+    LinearLayout btnPlayMusic, btnSMS, btnAlarm, btnCall;
 
     private BatteryReceiver batteryReceiver = new BatteryReceiver();
 
@@ -22,8 +23,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btnPlayMusic = findViewById(R.id.btn_play_music);
-        btnSMSAndCall = findViewById(R.id.btn_sms_call);
+        btnSMS = findViewById(R.id.btn_sms);
         btnAlarm = findViewById(R.id.btn_alarm);
+        btnCall = findViewById(R.id.btn_call);
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(batteryReceiver, filter);
@@ -33,7 +35,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnSMSAndCall.setOnClickListener(v -> {
+        btnSMS.setOnClickListener(v -> {
+            Intent intent = new Intent(this, SMSActivity.class);
+            startActivity(intent);
+        });
+        btnCall.setOnClickListener(v -> {
             Intent intent = new Intent(this, CallActivity.class);
             startActivity(intent);
         });
