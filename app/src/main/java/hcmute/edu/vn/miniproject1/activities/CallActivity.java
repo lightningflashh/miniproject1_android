@@ -13,6 +13,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
@@ -27,7 +28,11 @@ public class CallActivity extends AppCompatActivity {
     private StringBuilder phoneNumber = new StringBuilder(); // Chuỗi chứa số điện thoại nhập vào
     private BottomNavigationView bottomNavigationView; // Thanh điều hướng
     private ImageButton btnConfirm; // Nút gọi
-    private static final int REQUEST_CALL_PHONE = 1; // Hằng số yêu cầu quyền gọi điện
+    private static final int REQUEST_CALL_PHONE = 1;
+    private static final int REQUEST_READ_PHONE_STATE = 100;; // Hằng số yêu cầu quyền gọi điện
+
+    private static final int REQUEST_CALL_LOG_PERMISSION = 1001;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,9 @@ public class CallActivity extends AppCompatActivity {
         });
 
         setButtonListeners(); // Thiết lập sự kiện cho các nút số và nút gọi
+        // Gọi kiểm tra quyền
+        checkPermissions();
+        requestCallLogPermission();
     }
 
     // Gán sự kiện cho các nút bấm số và nút gọi
@@ -113,14 +121,39 @@ public class CallActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_CALL_PHONE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Nếu quyền được cấp, thực hiện cuộc gọi
-                makeCall();
+                makeCall(); // thực hiện lại nếu vừa được cấp quyền
             } else {
-                // Nếu quyền bị từ chối, hiển thị thông báo
                 Toast.makeText(this, "Quyền gọi điện bị từ chối!", Toast.LENGTH_SHORT).show();
             }
         }
+
+        if (requestCode == REQUEST_READ_PHONE_STATE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Đã cấp quyền đọc trạng thái cuộc gọi", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Không thể phát hiện cuộc gọi nếu thiếu quyền!", Toast.LENGTH_LONG).show();
+            }
+        }
     }
+
+    private void requestCallLogPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CALL_LOG},
+                    REQUEST_CALL_LOG_PERMISSION);
+        }
+    }
+
+
+    private void checkPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_READ_PHONE_STATE);
+        }
+    }
+
 
     // Khi quay lại màn hình chính, đặt lại biểu tượng điều hướng về "Dial"
     @Override
