@@ -34,7 +34,7 @@ public class CallService extends Service {
         }
 
         Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
-        callIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Bắt buộc khi gọi từ Service
+        callIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Không có quyền gọi điện!", Toast.LENGTH_SHORT).show();
@@ -43,4 +43,5 @@ public class CallService extends Service {
 
         startActivity(callIntent);
     }
+
 }
