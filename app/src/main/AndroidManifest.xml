@@ -2,12 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <uses-feature
         android:name="android.hardware.telephony"
@@ -55,15 +62,14 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Service có thể chạy trong Foreground -->
+        </activity>
         <service
             android:name=".services.SongService"
             android:enabled="true"
             android:exported="true"
-            android:foregroundServiceType="mediaPlayback" /> <!-- Broadcast Receiver nhận sự kiện BOOT_COMPLETED -->
+            android:foregroundServiceType="mediaPlayback" />
         <service
             android:name=".services.CallService"
             android:exported="false" />
@@ -73,7 +79,10 @@
         <service
             android:name=".services.SMSService"
             android:exported="false" />
-
+        <service
+            android:name=".services.BatteryMonitorService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false"/>
         <receiver
             android:name=".services.MySmsReceiver"
             android:exported="true"
@@ -99,7 +108,6 @@
             android:name=".activities.EventCompletedActivity"
             android:exported="false">
         </activity>
-
         <receiver android:name=".services.EventReminderReceiver"
             android:exported="true"
             android:enabled="true">
@@ -107,7 +115,12 @@
                 <action android:name="hcmute.edu.vn.miniproject1.EVENT_REMINDER"/>
             </intent-filter>
         </receiver>
-
+        <receiver android:name=".services.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

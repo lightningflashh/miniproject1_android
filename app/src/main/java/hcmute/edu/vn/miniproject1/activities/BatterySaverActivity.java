@@ -19,7 +19,13 @@ public class BatterySaverActivity extends AppCompatActivity {
         Button btnEnable = findViewById(R.id.btnEnable);
         Button btnCancel = findViewById(R.id.btnCancel);
 
-        txtMessage.setText("Pin đang yếu! Bạn có muốn bật chế độ tiết kiệm pin không?");
+        // Lấy thông báo từ Intent
+        String message = getIntent().getStringExtra("message");
+        if (message != null) {
+            txtMessage.setText(message);
+        } else {
+            txtMessage.setText("Pin đang yếu! Bạn có muốn bật chế độ tiết kiệm pin không?");
+        }
 
         btnEnable.setOnClickListener(v -> {
             enableBatterySaver();
