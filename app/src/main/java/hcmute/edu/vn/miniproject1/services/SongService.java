@@ -5,8 +5,10 @@ import static hcmute.edu.vn.miniproject1.utils.Constants.*;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
@@ -34,6 +36,8 @@ public class SongService extends Service {
 
     private Handler handler = new Handler();
 
+    private BroadcastReceiver headphoneReceiver;
+
     int currentPosition = 0;
     private final Runnable updateSeekBarRunnable = new Runnable() {
         @Override
@@ -48,6 +52,34 @@ public class SongService extends Service {
             }
         }
     };
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Đăng ký receiver tai nghe
+        headphoneReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (Intent.ACTION_HEADSET_PLUG.equals(intent.getAction())) {
+                    int state = intent.getIntExtra("state", -1);
+                    switch (state) {
+                        case 0:
+                            // Rút tai nghe
+                            pauseMusicFromHeadphone();
+                            break;
+                        case 1:
+                            // Cắm tai nghe
+                            resumeMusicFromHeadphone();
+                            break;
+                    }
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        registerReceiver(headphoneReceiver, filter);
+    }
 
 
     @Nullable
@@ -223,6 +255,29 @@ public class SongService extends Service {
         sendToListSongActivity(ACTION_PREV, 0);
     }
 
+    private void pauseMusicFromHeadphone() {
+        if (mediaPlayer != null && isPlaying) {
+            currentPosition = mediaPlayer.getCurrentPosition();
+            mediaPlayer.pause();
+            isPlaying = false;
+
+            sendNotification(mSong); // cập nhật thông báo
+            sendToListSongActivity(ACTION_PAUSE, currentPosition); // gửi broadcast về UI
+        }
+    }
+
+    private void resumeMusicFromHeadphone() {
+        if (mediaPlayer != null && !isPlaying) {
+            mediaPlayer.seekTo(currentPosition);
+            mediaPlayer.start();
+            isPlaying = true;
+
+            sendNotification(mSong);
+            sendToListSongActivity(ACTION_RESUME, currentPosition);
+        }
+    }
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -231,6 +286,8 @@ public class SongService extends Service {
             mediaPlayer.release();
             mediaPlayer = null;
         }
-        Log.e("Notification", "Service onDestroy");
+        if (headphoneReceiver != null) {
+            unregisterReceiver(headphoneReceiver);
+        }
     }
 }
