@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
         btnCall.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CallActivity.class);
+            Intent intent = new Intent(this, CallsActivity.class);
             startActivity(intent);
         });
         btnAlarm.setOnClickListener(v -> {
