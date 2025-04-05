@@ -8,25 +8,20 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
-
-
-
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <!-- Khai báo phần cứng không bắt buộc -->
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false" />
-
-    <uses-permission
-        android:name="android.permission.CALL_PHONE"
-        tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission
-        android:name="android.permission.SEND_SMS"
-        tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
@@ -44,7 +39,7 @@
             android:name=".activities.BatterySaverActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.CallActivity"
+            android:name=".activities.CallsActivity"
             android:exported="false" />
         <activity
             android:name=".activities.SMSActivity"
@@ -70,16 +65,17 @@
             android:exported="true"
             android:foregroundServiceType="mediaPlayback" /> <!-- Broadcast Receiver nhận sự kiện BOOT_COMPLETED -->
         <service
-            android:name=".services.CallService"
-            android:exported="false" />
-        <service
-            android:name=".services.CallStateService"
-            android:exported="false"
-             />
-
-        <service
             android:name=".services.SMSService"
             android:exported="false" />
+
+        <receiver
+            android:name=".services.SMSReceiver"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter android:priority="1000">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".services.CallReceiver"
@@ -87,16 +83,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
-        </receiver>
-
-
-        <receiver
-            android:name=".services.MySmsReceiver"
-            android:exported="true"
-            android:permission="android.permission.BROADCAST_SMS">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
             </intent-filter>
         </receiver>
         <receiver
@@ -107,6 +94,15 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".services.BlacklistService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            tools:ignore="ForegroundServicePermission" />
+        <activity android:name=".activities.BlacklistActivity"/>
+
 
         <activity
             android:name=".activities.CalendarActivity"
